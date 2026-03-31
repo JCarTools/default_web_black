@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>My Black Window</title>
+
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body{
+  background: #0F0D13;
+
+  transition: background-image .5s ease;
+
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+
+  font-family: "Roboto", Arial, sans-serif;
+  color: #D9D9D9;
+  position:relative;
+}
+
+body.light {
+background: #DFE0E9;
+  color: #1C1119;
+}
+
+/* ===== Центральный контейнер ===== */
+.dashboard {
+position:absolute;
+  display: flex;
+  
+
+  flex-wrap:wrap-reverse;
+
+  align-items:  flex-start;
+  gap: 24px;
+  bottom:30px;
+  left:30px;
+  right:30px;
+  gap:30px;
+}
+
+/* ===== Кнопка закрытия окна ===== */
+.close_button{
+	position:absolute; 
+	right:30px;
+	top:30px;
+	width:40px;
+	height:40px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	border-radius:20px;
+	background:#1D1B20;
+}
+.close_button:before{
+	content:'';
+	position:absolute; 
+	left:-20px; 
+	right:-20px; 
+	top:-20px; 
+	bottom:-20px;
+}
+body.light .close_button{
+	background:#D3D4DD;
+}
+body.light .close_button svg path{
+	fill:#1C1119;
+}
+
+/* ===== Кнопка настроек ===== */
+.settings_button{
+	position:absolute; 
+	right:0;
+	bottom:0;
+	width:40px;
+	height:40px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	border-radius:20px;
+	background:#1D1B20;
+}
+.settings_button{
+	content:'';
+	position:absolute; 
+	right:30px;
+	bottom:80px;
+	display:flex;
+	gap:12px;
+}
+body.light .settings_button{
+	background:#D3D4DD;
+}
+body.light .settings_button svg path{
+	fill:#1C1119;
+}
+
+
+.widget_buttons{
+	width:90px;
+	height:90px;
+	text-align:center;
+	align-items:center;
+	flex-direction: column;
+	justify-content:center;
+	display:flex;
+	background:#1D1B20;
+	border-radius:20px;
+	padding:24px;
+	box-sizing:border-box;
+	
+}
+
+/* ===== Виджеты ===== */
+.widget{
+	background:#1D1B20;
+	border-radius:20px;
+	padding:24px;
+	box-sizing:border-box;
+	height:214px;
+}
+body.light .widget{
+	background:#D3D4DD;
+}
+
+/* ===== Виджет Время ===== */
+.widget_time{
+	width:275px;
+	text-align:center;
+	align-items:center;
+	flex-direction: column;
+	justify-content:center;
+	display:flex;
+	
+}
+.widget_time__time{
+	font-size:64px;
+	line-height:67px;
+}
+.widget_time__date{
+	font-size:24px;
+	line-height:27px;
+}
+
+/* ===== Виджет Плеер ===== */
+.widget_player{
+	width:685px;
+	display:flex;
+	gap:25px;
+}
+.widget_player__image{
+	flex-shrink:0;
+	flex-grow:0;
+	width:166px;
+	height:166px;
+	border-radius:10px;
+	overflow:hidden;
+	position:relative;
+}
+.widget_player__image img{
+	object-fit: cover;
+	width:100%;
+	height:100%;
+}
+.widget_player__right{
+	padding-top:17px;
+}
+.widget_player__first_row{
+	display:flex;
+	height:62px;
+}
+.widget_player__buttons{
+	width:160px;
+	height:62px;
+	display:flex;
+	flex-shrink:0;
+	flex-grow:0;
+	align-items:center;
+	margin-left:15px;
+}
+.widget_player__play{
+	width:92px;
+	height:92px;
+	border-radius:14px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	
+}
+body.light .widget_player__play{
+	background:#1C1119;
+}
+body.light .widget_player__play svg path{
+	fill:#D3D4DD;
+}
+body.light .widget_player__play svg rect{
+	fill:#D3D4DD;
+}
+.widget_player__next, .widget_player__prev{
+	width:92px;
+	height:92px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+.widget_player__next{
+	margin-left:17px;
+}
+.widget_player__prev{
+	margin-right:17px;
+}
+body.light .widget_player__next svg path, body.light .widget_player__prev svg path{
+	fill:#1C1119;
+}
+.widget_player__titles{
+	display:flex;
+	flex-direction: column;
+	justify-content:center;
+	height:62px;
+	width:255px;
+	flex-shrink:0;
+	flex-grow:0;
+}
+.widget_player__title{
+	font-size:22px;
+	line-height:25px;
+	color:#D9D9D9;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+body.light .widget_player__title{
+	color:#1C1119;
+}
+.widget_player__artist{
+	font-size:18px;
+	line-height:21px;
+	color:#AFB5B7;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+	margin-top:4px;
+}
+body.light .widget_player__artist{
+	color:#1C1119;
+	opacity:50%;
+}
+.widget_player__track_row{
+	display:flex;
+	margin-top:46px;
+	align-items:center;
+}
+.widget_player__track_line{
+	position:relative;
+	height:6px;
+	background:#41475A;
+	max-width:325px; 
+	width:100%;
+	margin-right: 15px;
+	border-radius:6px;
+}
+body.light .widget_player__track_line{
+	background:#78727B;
+}
+.widget_player__track_progress{
+	position:absolute;
+	left:0;
+	top:0;
+	height:100%;
+	background:#D9D9D9;
+	border-radius:6px;
+}
+body.light .widget_player__track_progress{
+	background:#1C1119;
+}
+.widget_player__track_dot{
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(28, 17, 25, 0.5);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(28, 17, 25, 0.5);
+	box-shadow: 0px 1px 2px 0px rgba(28, 17, 25, 0.5);
+	position:absolute;
+	right:-4px;
+	top:-4px;
+	width:15px;
+	height:15px;
+	border-radius:50%;
+	background:#D9D9D9;
+}
+body.light .widget_player__track_dot{
+	background:#1C1119;
+}
+.widget_player__track_time{
+	padding-top:2px;
+	white-space:nowrap;
+	min-width:112px;
+	text-align:right;
+}
+
+.widget_compass{
+  width:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.compass{
+  position:relative;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+}
+
+.compass_ring{
+  position:absolute;
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  border:2px solid #3A3A3A;
+}
+
+#compass_arrow{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) rotate(0deg);
+  transform-origin:50% 50%;
+  transition:transform .4s ease;
+}
+
+.compass_labels span{
+  position:absolute;
+  font-size:14px;
+  opacity:0.8;
+}
+
+.n{ top:5px; left:50%; transform:translateX(-50%); }
+.s{ bottom:5px; left:50%; transform:translateX(-50%); }
+.e{ right:5px; top:50%; transform:translateY(-50%); }
+.w{ left:5px; top:50%; transform:translateY(-50%); }
+
+#compass_deg{
+  position:absolute;
+  bottom:-25px;
+  width:100%;
+  text-align:center;
+  font-size:18px;
+}
+
+.widget2{
+	background:#1D1B20;
+	border-radius:20px;
+	padding:15px;
+	box-sizing:border-box;
+	height:214px;
+}
+
+.widget_apps{
+  width:260px;
+
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  grid-auto-rows:90px;
+
+  gap:8px;
+}
+
+.app_slot{
+  width:100%;
+  height:100%;
+  border-radius:18px;
+
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+
+  background:#2A2730; 
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+  transition:all .2s;
+}
+
+.app_picker{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(.92);
+  opacity:0;
+
+  width:420px;
+  max-height:60vh;
+  background:#1D1B20;
+  border-radius:20px;
+  padding:20px;
+  overflow-y:auto;
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+
+  pointer-events:none;
+  transition:
+    transform .22s ease,
+    opacity .22s ease;
+}
+
+.app_picker_open{
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1;
+  pointer-events:auto;
+}
+
+.hidden{
+  display:none;
+}
+
+.app_picker_loading{
+  grid-column:1 / -1;
+  min-height:180px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+
+.app_picker_spinner{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#D9D9D9;
+  animation:appPickerSpin .8s linear infinite;
+}
+
+.app_picker_loading_text{
+  font-size:14px;
+  opacity:.75;
+}
+
+@keyframes appPickerSpin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+.app_slot img{
+  width:48px;
+  height:48px;
+}
+
+.app_item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  gap:6px;
+
+  padding:10px;
+  border-radius:14px;
+
+  cursor:pointer;
+
+  transition:background .2s;
+}
+
+.app_item:hover{
+  background:#2A2730;
+}
+
+.app_item img{
+  width:48px;
+  height:48px;
+}
+
+.app_item span{
+  font-size:12px;
+  text-align:center;
+}
+
+#btnWallpaper.active{
+  background:#34303D !important;
+}
+
+</style>
+
+</head>
+
+<body > <!--<body class="light">-->
+
+
+<div class="dashboard">
+
+	<div class="settings_button">
+        <div id="btnWallpaper" class="widget_buttons">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M4 5H20V19H4V5Z" stroke="#D9D9D9" stroke-width="2"/>
+                <circle cx="8" cy="9" r="2" fill="#D9D9D9"/>
+                <path d="M4 17L10 11L14 15L18 13L20 17" stroke="#D9D9D9" stroke-width="2"/>
+            </svg>
+        </div>
+		<div id="btnSettings" class="widget_buttons">
+			<svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M7.3 20L6.9 16.8C6.68333 16.7167 6.47917 16.6167 6.2875 16.5C6.09583 16.3833 5.90833 16.2583 5.725 16.125L2.75 17.375L0 12.625L2.575 10.675C2.55833 10.5583 2.55 10.4458 2.55 10.3375V9.6625C2.55 9.55417 2.55833 9.44167 2.575 9.325L0 7.375L2.75 2.625L5.725 3.875C5.90833 3.74167 6.1 3.61667 6.3 3.5C6.5 3.38333 6.7 3.28333 6.9 3.2L7.3 0H12.8L13.2 3.2C13.4167 3.28333 13.6208 3.38333 13.8125 3.5C14.0042 3.61667 14.1917 3.74167 14.375 3.875L17.35 2.625L20.1 7.375L17.525 9.325C17.5417 9.44167 17.55 9.55417 17.55 9.6625V10.3375C17.55 10.4458 17.5333 10.5583 17.5 10.675L20.075 12.625L17.325 17.375L14.375 16.125C14.1917 16.2583 14 16.3833 13.8 16.5C13.6 16.6167 13.4 16.7167 13.2 16.8L12.8 20H7.3ZM10.1 13.5C11.0667 13.5 11.8917 13.1583 12.575 12.475C13.2583 11.7917 13.6 10.9667 13.6 10C13.6 9.03333 13.2583 8.20833 12.575 7.525C11.8917 6.84167 11.0667 6.5 10.1 6.5C9.11667 6.5 8.2875 6.84167 7.6125 7.525C6.9375 8.20833 6.6 9.03333 6.6 10C6.6 10.9667 6.9375 11.7917 7.6125 12.475C8.2875 13.1583 9.11667 13.5 10.1 13.5Z" fill="#D9D9D9"/>
+			</svg>
+		</div>
+		<div id="btnClose" class="widget_buttons">
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" fill="#D9D9D9"/>
+			</svg>
+		</div>
+	</div>
+	<!--
+	<div class="widget_time widget">
+		<div class="weather-temp">-- °C</div>
+	</div>
+	-->
+	<div class="widget_compass widget">
+  <div class="compass">
+    <div class="compass_ring"></div>
+
+    <div id="compass_arrow">
+<svg width="40" height="100" viewBox="0 0 40 100">
+
+  <!-- север -->
+  <polygon points="20,0 30,50 10,50" fill="#ff3b3b"/>
+
+  <!-- юг -->
+  <polygon points="20,100 30,50 10,50" fill="#888"/>
+
+</svg>
+</div>
+
+    <div class="compass_labels">
+      <span class="n">N</span>
+      <span class="e">E</span>
+      <span class="s">S</span>
+      <span class="w">W</span>
+    </div>
+
+    <div id="compass_deg">0°</div>
+  </div>
+</div>
+	
+	<div class="widget_time widget">
+		<div class="widget_time__time">10:30</div>
+		<div class="widget_time__date">31 сентября</div>
+	</div>
+	<script>
+function updateDateTime() {
+    const now = new Date();
+
+    // время
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const time = `${hours}:${minutes}`;
+
+    // дата
+    const months = [
+        'января','февраля','марта','апреля','мая','июня',
+        'июля','августа','сентября','октября','ноября','декабря'
+    ];
+
+    const day = now.getDate();
+    const month = months[now.getMonth()];
+    const date = `${day} ${month}`;
+
+    document.querySelector('.widget_time__time').textContent = time;
+    document.querySelector('.widget_time__date').textContent = date;
+}
+
+// обновляем сразу
+updateDateTime();
+
+// обновляем каждую минуту
+setInterval(updateDateTime, 60000);
+</script>
+	<div class="widget_player widget">
+		<div class="widget_player__image">
+			<img src="img.jpg">
+		</div>
+		<div class="widget_player__right">
+			<div class="widget_player__first_row">
+				<div class="widget_player__titles">
+					<div class="widget_player__title">Название песни</div>
+					<div class="widget_player__artist">Имя артиста</div>
+				</div>
+				<div class="widget_player__buttons">
+					<div id="player__prev" class="widget_player__prev">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M0 0H2.66667V16H0V0ZM4.66667 8L16 16V0L4.66667 8Z" fill="#D9D9D9"/>
+						</svg>
+
+					</div>
+					<div id="player__play" class="widget_player__play">
+						<svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M0 0V18.0833L14.2083 9.04167L0 0Z" fill="#D9D9D9"/>
+						</svg>
+					</div>
+					<div id="player__pause" class="widget_player__play">
+					<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<rect width="3" height="18" fill="#D9D9D9"/>
+							<rect x="7" width="3" height="18" fill="#D9D9D9"/>
+						</svg>
+					</div>
+					<div id="player__next" class="widget_player__next">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M0 16L11.3333 8L0 0V16ZM13.3333 0V16H16V0H13.3333Z" fill="#D9D9D9"/>
+						</svg>
+					</div>
+				</div>
+				
+			</div>
+			<div class="widget_player__track_row">
+				<div class="widget_player__track_line">
+					<div class="widget_player__track_progress" style="width:0%;">
+						<div class="widget_player__track_dot"></div>
+					</div>
+				</div>
+				<div class="widget_player__track_time">
+					<span>02:24</span>
+					/
+					<span>22:32</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="widget_apps widget2">
+
+		<div class="app_slot" data-slot="1"></div>
+		<div class="app_slot" data-slot="2"></div>
+		<div class="app_slot" data-slot="3"></div>
+		<div class="app_slot" data-slot="4"></div>
+	</div>
+	<div id="app_picker" class="app_picker hidden">
+		
+	</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
