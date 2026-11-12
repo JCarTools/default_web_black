@@ -157,6 +157,9 @@ body.light .widget{
 	gap:25px;
 }
 .widget_player__image{
+	border:0;
+	padding:0;
+	background:transparent;
 	flex-shrink:0;
 	flex-grow:0;
 	width:166px;
@@ -169,6 +172,10 @@ body.light .widget{
 	object-fit: cover;
 	width:100%;
 	height:100%;
+}
+.widget_player__image:not(:disabled),
+#player__toggle{
+	cursor:pointer;
 }
 .widget_player__right{
 	padding-top:17px;
@@ -187,6 +194,9 @@ body.light .widget{
 	margin-left:15px;
 }
 .widget_player__play{
+	border:0;
+	padding:0;
+	background:transparent;
 	width:92px;
 	height:92px;
 	border-radius:14px;
@@ -194,6 +204,13 @@ body.light .widget{
 	align-items:center;
 	justify-content:center;
 	
+}
+#player__toggle .pause-icon,
+#player__toggle.is-playing .play-icon{
+	display:none;
+}
+#player__toggle.is-playing .pause-icon{
+	display:block;
 }
 body.light .widget_player__play{
 	background:#1C1119;
@@ -269,6 +286,26 @@ body.light .widget_player__artist{
 }
 body.light .widget_player__track_line{
 	background:#78727B;
+}
+.widget_player__track_seek{
+	position:absolute;
+	z-index:1;
+	left:0;
+	top:50%;
+	transform:translateY(-50%);
+	width:100%;
+	height:44px;
+	margin:0;
+	opacity:0;
+	touch-action:none;
+	cursor:pointer;
+}
+.widget_player__track_seek:disabled{
+	pointer-events:none;
+}
+.widget_player__track_line:focus-within{
+	outline:2px solid #9fa9c5;
+	outline-offset:4px;
 }
 .widget_player__track_progress{
 	position:absolute;
@@ -587,9 +624,9 @@ updateDateTime();
 setInterval(updateDateTime, 60000);
 </script>
 	<div class="widget_player widget">
-		<div class="widget_player__image">
-			<img src="img.jpg">
-		</div>
+		<button type="button" class="widget_player__image" aria-label="Открыть текущий плеер" disabled>
+			<img src="img.jpg" alt="" draggable="false">
+		</button>
 		<div class="widget_player__right">
 			<div class="widget_player__first_row">
 				<div class="widget_player__titles">
@@ -603,17 +640,15 @@ setInterval(updateDateTime, 60000);
 						</svg>
 
 					</div>
-					<div id="player__play" class="widget_player__play">
-						<svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<button type="button" id="player__toggle" class="widget_player__play" aria-label="Воспроизвести">
+						<svg class="play-icon" aria-hidden="true" width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M0 0V18.0833L14.2083 9.04167L0 0Z" fill="#D9D9D9"/>
 						</svg>
-					</div>
-					<div id="player__pause" class="widget_player__play">
-					<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg class="pause-icon" aria-hidden="true" width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<rect width="3" height="18" fill="#D9D9D9"/>
 							<rect x="7" width="3" height="18" fill="#D9D9D9"/>
 						</svg>
-					</div>
+					</button>
 					<div id="player__next" class="widget_player__next">
 						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M0 16L11.3333 8L0 0V16ZM13.3333 0V16H16V0H13.3333Z" fill="#D9D9D9"/>
@@ -624,6 +659,8 @@ setInterval(updateDateTime, 60000);
 			</div>
 			<div class="widget_player__track_row">
 				<div class="widget_player__track_line">
+					<input type="range" id="player__seek" class="widget_player__track_seek"
+						min="0" max="1" step="1" value="0" aria-label="Позиция трека" disabled>
 					<div class="widget_player__track_progress" style="width:0%;">
 						<div class="widget_player__track_dot"></div>
 					</div>

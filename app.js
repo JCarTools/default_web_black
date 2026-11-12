@@ -1,4 +1,58 @@
 const TOKEN = "SECURE_TOKEN_2025";
+let playerPackage = "";
+let playerPosition = 0;
+let playerDuration = 0;
+let playerTrack = "";
+let scrubTrack = null;
+
+function formatTrackTime(ms) {
+  const seconds = Math.floor(ms / 1000);
+  return Math.floor(seconds / 60) + ":" + String(seconds % 60).padStart(2, "0");
+}
+
+function renderTrack(position) {
+  const seek = document.getElementById("player__seek");
+  const clamped = Math.min(playerDuration, Math.max(0, position));
+  seek.max = String(playerDuration || 1);
+  seek.value = String(clamped);
+  document.querySelector(".widget_player__track_progress").style.width =
+    (playerDuration ? clamped / playerDuration * 100 : 0) + "%";
+  document.querySelector(".widget_player__track_time span:first-child").textContent =
+    formatTrackTime(clamped);
+  document.querySelector(".widget_player__track_time span:last-child").textContent =
+    formatTrackTime(playerDuration);
+}
+
+function updatePlayer(data) {
+  if (typeof data === "string") {
+    try { data = JSON.parse(data); } catch (_) { return; }
+  }
+  if (!data || !document.getElementById("player__seek")) return;
+
+  document.querySelector(".widget_player__title").textContent = data.SongName || "—";
+  document.querySelector(".widget_player__artist").textContent = data.SongArtist || "";
+  const cover = document.querySelector(".widget_player__image");
+  if (typeof data.SongAlbumPicture === "string") {
+    cover.querySelector("img").src = data.SongAlbumPicture
+      ? "data:image/png;base64," + data.SongAlbumPicture : "img.jpg";
+  }
+  playerPackage = typeof data.packageName === "string" ? data.packageName.trim() : "";
+  cover.disabled = !playerPackage || typeof (window.androidApi || {}).runApp !== "function";
+
+  const pos = Number(data.Trpos);
+  const dur = Number(data.Trdur);
+  playerDuration = Number.isFinite(dur) ? Math.max(0, Math.round(dur)) : 0;
+  playerPosition = Number.isFinite(pos) ? Math.max(0, Math.round(pos)) : 0;
+  playerTrack = JSON.stringify([playerPackage, data.SongName, data.SongArtist, data.SongAlbum, playerDuration]);
+  document.getElementById("player__seek").disabled =
+    !playerDuration || typeof (window.androidApi || {}).seekMusic !== "function";
+  if (scrubTrack === null) renderTrack(playerPosition);
+
+  const toggle = document.getElementById("player__toggle");
+  const playing = data.PlayStat === "PLAY";
+  toggle.classList.toggle("is-playing", playing);
+  toggle.setAttribute("aria-label", playing ? "Пауза" : "Воспроизвести");
+}
 
 document.addEventListener("contextmenu", function(e){
   e.preventDefault();
@@ -67,48 +121,7 @@ window.onAndroidEvent = function (type, data) {
   break;
 
 case "musicInfo":
-
-  if (typeof data === "string") {
-    data = JSON.parse(data);
-  }
-
-  // название
-  document.querySelector(".widget_player__title").textContent =
-    data.SongName || "—";
-
-  // артист
-  document.querySelector(".widget_player__artist").textContent =
-    data.SongArtist || "";
-
-  // обложка
-  if (data.SongAlbumPicture) {
-    document.querySelector(".widget_player__image img").src =
-      "data:image/png;base64," + data.SongAlbumPicture;
-  }
-
-  // прогресс трека
-  const pos = parseFloat(data.Trpos || 0);
-  const dur = parseFloat(data.Trdur || 1);
-
-  const percent = (pos / dur) * 100;
-
-  document.querySelector(".widget_player__track_progress").style.width =
-    percent + "%";
-
-  // время
- function format(t) {
-   const totalSeconds = Math.floor(t / 1000);
-   const m = Math.floor(totalSeconds / 60);
-   const s = totalSeconds % 60;
-   return m + ":" + String(s).padStart(2, "0");
- }
-
-  const time = document.querySelector(".widget_player__track_time span:first-child");
-  const duration = document.querySelector(".widget_player__track_time span:last-child");
-
-  time.textContent = format(pos);
-  duration.textContent = format(dur);
-
+  updatePlayer(data);
   break;
   
   case "gps":
@@ -179,24 +192,44 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   
-  const player__play = document.getElementById("player__play");
-
-  if (player__play) {
-    player__play.addEventListener("click", function () {
-      if (window.androidApi && window.androidApi.runEnum) {
-        window.androidApi.runEnum(TOKEN,"MEDIA_PLAY");
+  document.getElementById("player__toggle").addEventListener("click", () => {
+    if (window.androidApi && window.androidApi.runEnum) {
+      const result = window.androidApi.runEnum(TOKEN, "MEDIA_PLAY_PAUSE");
+      if (result) {
+        try {
+          if (JSON.parse(result).error === "unknown_enum") {
+            const playing = document.getElementById("player__toggle").classList.contains("is-playing");
+            window.androidApi.runEnum(TOKEN, playing ? "MEDIA_PAUSE" : "MEDIA_PLAY");
+          }
+        } catch (_) {}
       }
-    });
-  }
-  const player__pause = document.getElementById("player__pause");
+    }
+  });
 
-  if (player__pause) {
-    player__pause.addEventListener("click", function () {
-      if (window.androidApi && window.androidApi.runEnum) {
-        window.androidApi.runEnum(TOKEN,"MEDIA_PAUSE");
-      }
-    });
-  }
+  document.querySelector(".widget_player__image").addEventListener("click", () => {
+    if (playerPackage && window.androidApi && window.androidApi.runApp) {
+      window.androidApi.runApp(TOKEN, playerPackage);
+    }
+  });
+
+  const seek = document.getElementById("player__seek");
+  seek.addEventListener("input", () => {
+    if (scrubTrack === null) scrubTrack = playerTrack;
+    renderTrack(Number(seek.value));
+  });
+  seek.addEventListener("change", () => {
+    const position = Number(seek.value);
+    if (!seek.disabled && (scrubTrack === null || scrubTrack === playerTrack)
+        && Number.isFinite(position) && typeof (window.androidApi || {}).seekMusic === "function") {
+      if (window.androidApi.seekMusic(TOKEN, Math.round(position))) playerPosition = position;
+    }
+    scrubTrack = null;
+    renderTrack(playerPosition);
+  });
+  seek.addEventListener("pointercancel", () => {
+    scrubTrack = null;
+    renderTrack(playerPosition);
+  });
 
   /*
 
